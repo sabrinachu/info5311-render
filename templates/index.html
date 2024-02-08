@@ -31,18 +31,14 @@
 
         </div>
 
-        <div style="margin: 100px">
-            <svg id="first" height="400" width="350" style="margin-right: 50px; margin-left:170px"> </svg>
+        <div style="display: block; margin: 100px">
+            <svg id="first" height="400" width="350"> </svg>
             <svg id="second" height="400" width="350"></svg>
-            <svg id="third" height="400" width="350" style="margin-left: 50px; margin-right: 100px"> </svg>
-        </div>
-
-        <div style="margin: 100px">
-            <svg id="fourth" height="400" width="350" style="margin-right: 50px; margin-left:170px"> </svg>
+            <svg id="third" height="400" width="350"> </svg>
+            <svg id="fourth" height="400" width="350"> </svg>
             <svg id="fifth" height="400" width="350"></svg>
-            <svg id="sixth" height="400" width="350" style="margin-left: 50px; margin-right: 100px"> </svg>
+            <svg id="sixth" height="400" width="350"> </svg>
         </div>
-
 
         <script>
             var svgLegend = d3.select("svg#legend");
@@ -118,6 +114,8 @@
 
                 const sfMap = await d3.json("./static/SF-Neighborhoods.geo.json");
 
+                // const sfMap = await d3.json(".././static/SF-Neighborhoods.geo.json");
+
                 var neighborhoods = topojson.feature(sfMap, sfMap.objects.SFNeighborhoods);
 
                 var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], neighborhoods);
@@ -133,6 +131,8 @@
 
 
                 const trees = await d3.csv("./static/Street_Tree_List-2022-01-30_FILTERED.csv");
+
+                // const trees = await d3.csv(".././static/Street_Tree_List-2022-01-30_FILTERED.csv");
                 
                 trees.forEach(row => {
                     row.qSpecies = row.qSpecies.split('::')[0].trim();
