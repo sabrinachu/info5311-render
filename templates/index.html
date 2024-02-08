@@ -116,7 +116,7 @@
 
             const requestData = async function () {
 
-                const sfMap = await d3.json("./SF-Neighborhoods.geo.json");
+                const sfMap = await d3.json("./static/SF-Neighborhoods.geo.json");
 
                 var neighborhoods = topojson.feature(sfMap, sfMap.objects.SFNeighborhoods);
 
@@ -132,7 +132,7 @@
                     .attr("stroke-width", 1);
 
 
-                const trees = await d3.csv("./Street_Tree_List-2022-01-30_FILTERED.csv");
+                const trees = await d3.csv("./static/Street_Tree_List-2022-01-30_FILTERED.csv");
                 
                 trees.forEach(row => {
                     row.qSpecies = row.qSpecies.split('::')[0].trim();
