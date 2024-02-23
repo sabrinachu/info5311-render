@@ -24,7 +24,7 @@
       const drawMap = async () => {
 
         // geojson
-        const world = await d3.json("world-data.json");
+        const world = await d3.json(".././static/world-data.json");
 
         // countries
         const countries = topojson.feature(world, world.objects.countries);
@@ -33,7 +33,7 @@
         const countriesMesh = topojson.mesh(world, world.objects.countries);
 
         // load volcano data
-        let volcanoes = await d3.csv("volcanoes_filtered4.csv");
+        let volcanoes = await d3.csv(".././static/volcanoes_filtered4.csv");
         console.log(volcanoes);
 
         let volcanoCountries = new Set(volcanoes.map(d => d.country));
