@@ -1,0 +1,116 @@
+/* General CSS ------------------------------*/
+.outline {
+  fill: none;
+  stroke: black;
+}
+
+.filter_label {
+  margin: 0em;
+}
+
+.mouseover {
+  pointer-events: none;
+}
+
+.country {
+  fill: rgb(92, 91, 91);
+}
+
+body {
+  padding: 2em 2em;
+  margin: auto;
+  background-color: rgb(42, 37, 37);
+  color: white;
+  font-family: Helvetica
+}
+
+table {
+  color: white;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-top: 2px solid white;
+  border-bottom: 2px solid #ddd;
+  padding: 10px;
+}
+
+#panel {
+  height: 400px;
+  width: 300px;
+  float: left;
+  padding: 20 30 20 20;
+}
+
+.filter_label {
+  font-weight: bold;
+}
+
+.volcano_button {
+  background-color: white;
+  color: black;
+  border-radius: 5px;
+  border: none;
+  padding: 5px 7px;
+  margin: 5px 5px 0px 0px;
+  border: 3px solid white
+}
+
+.volcano_button:hover {
+  background-color: rgb(72, 17, 17);
+  color: white;
+}
+
+.selected-volcano-type {
+  background-color: rgb(72, 17, 17);
+  border: 3px solid white;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 7px;
+  margin: 5px 5px 0px 0px;
+}
+
+/* slider styles ------------------------------ */
+
+.left_panel{
+  border-right: 2px solid white;
+  height: 660px;
+  float: left;
+  padding-right: 2em;
+  margin-right: 1em;
+  width: 250px;;
+}
+
+.slider-ticks {
+  font: 14px sans-serif;
+}
+
+.background,
+.background-inset,
+.background-overlay {
+  stroke-linecap: round;
+}
+
+.background {
+  stroke: #333232;
+  stroke-width: 10px;
+}
+
+.background-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+}
+
+.selected {
+  stroke: #9e0b00;
+  stroke-width: 8px;
+}
+
+.knob {
+  fill: #E0F7FA;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+  cursor: pointer;
+}
