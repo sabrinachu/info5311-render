@@ -218,7 +218,7 @@
         let data_markers = svg.selectAll("image")
           .data(data)
           .join('image')
-          .attr('xlink:href', 'marker.png')
+          .attr('xlink:href', '.././static/marker.png')
           .attr("width", markerWidth)
           .attr("height", markerHeight)
           .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
