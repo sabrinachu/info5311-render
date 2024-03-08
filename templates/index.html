@@ -772,8 +772,8 @@
               createText("Similar Restaurant:", 380, "#66b2b2")
               createText(d3.select(this).datum().name, 400, "#004c4c", "14px")
               createText("Neighborhood: " + d3.select(this).datum().neighborhood, 430, "#66b2b2")
-              createText("Type: " + d3.select(this).datum().type, 450, "#66b2b2")
-              createText("Category: " + d3.select(this).datum().category, 470, "#66b2b2")
+              createText("Type: " + capitalizeFirstLetter(d3.select(this).datum().type), 450, "#66b2b2")
+              createText("Category: " + capitalizeFirstLetter(d3.select(this).datum().category), 470, "#66b2b2")
               createText("Rating: " + d3.select(this).datum().rating, 490, "#66b2b2")
               createText("Similarity: " + d3.select(this).datum().score.toFixed(3), 510, "#66b2b2")
 
@@ -814,6 +814,10 @@
 
         }
 
+        function capitalizeFirstLetter(string) {
+          return string.trim().charAt(0).toUpperCase() + string.trim().slice(1);
+        }
+
         network.selectAll("text")
           .data(mostSimilar)
           .join("text")
@@ -843,7 +847,7 @@
 
             function createText(text, y, fill, font = "12px") {
               network.append("text")
-                .text(text)
+                .text(capitalizeFirstLetter(text))
                 .attr("class", "net-display")
                 .attr("x", 595)
                 .attr("y", y)
@@ -858,8 +862,8 @@
             createText("Similar Restaurant:", 90, "#66b2b2")
             createText(d3.select(this).datum().name, 120, "#004c4c", "14px")
             createText("Neighborhood: " + d3.select(this).datum().neighborhood, 150, "#66b2b2")
-            createText("Type: " + nameFood, 170, "#66b2b2")
-            createText("Category: " + d3.select(this).datum().category, 190, "#66b2b2")
+            createText("Type: " + d3.select(this).datum().type, 170, "#66b2b2")
+            createText("Category: " + capitalizeFirstLetter(d3.select(this).datum().category), 190, "#66b2b2")
             createText("Rating: " + d3.select(this).datum().rating, 210, "#66b2b2")
             createText("Similarity: " + d3.select(this).datum().score.toFixed(3), 230, "#66b2b2")
 
