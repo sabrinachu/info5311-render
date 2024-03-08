@@ -184,8 +184,8 @@
     const drawPittsburgh = async () => {
 
       //load data 
-      let pitt = await d3.json("pittsburgh.geojson");
-      let cityData_unfiltered = await d3.csv("yelp_pittsburgh.csv");
+      let pitt = await d3.json(".././static/pittsburgh.geojson");
+      let cityData_unfiltered = await d3.csv(".././static/yelp_pittsburgh.csv");
 
       //removed restaurants with no neighborhood
       let cityData = cityData_unfiltered.filter(d => d.neighborhood !== "");
