@@ -1,910 +1,911 @@
 <html>
 
 <head>
-  <title>HW3: INFO5311</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://d3js.org/topojson.v3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <title>HW3: INFO5311</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
-  <style>
-    body {
-      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-      background-color: #f1fbf9;
-    }
+    <style>
+        body {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            background-color: #f1fbf9;
+        }
 
-    h1 {
-      color: #004c4c;
-      text-align: center;
-      /* border: 2px solid; */
-      /* border-radius: 20px; */
+        h1 {
+            color: #004c4c;
+            text-align: center;
+            /* border: 2px solid; */
+            /* border-radius: 20px; */
 
-    }
+        }
 
-    h3 {
-      color: #006666;
-    }
+        h3 {
+            color: #006666;
+        }
 
-    .tooltip {
-      background: purple;
-      border: 1px solid #ddd;
-      padding: 4px 8px;
-      border-radius: 4px;
-      pointer-events: none;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      font-size: 0.9em;
-    }
+        .tooltip {
+            background: purple;
+            border: 1px solid #ddd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+        }
 
-    .type_button {
-      background-color: white;
-      color: black;
-      border-radius: 5px;
-      border: none;
-      padding: 5px 7px;
-      margin: 5px 5px 0px 0px;
-      border: 3px solid #66b2b2;
-    }
+        .type_button {
+            background-color: white;
+            color: black;
+            border-radius: 5px;
+            border: none;
+            padding: 5px 7px;
+            margin: 5px 5px 0px 0px;
+            border: 3px solid #66b2b2;
+        }
 
-    .type_button:hover {
-      background-color: #66b2b2;
-      color: white;
-      border: 3px solid #004c4c;
-    }
+        .type_button:hover {
+            background-color: #66b2b2;
+            color: white;
+            border: 3px solid #004c4c;
+        }
 
-    .selected-type {
-      background-color: #66b2b2;
-      border: 3px solid #004c4c;
-      color: white;
-      border-radius: 5px;
-      padding: 5px 7px;
-      margin: 5px 5px 0px 0px;
-    }
+        .selected-type {
+            background-color: #66b2b2;
+            border: 3px solid #004c4c;
+            color: white;
+            border-radius: 5px;
+            padding: 5px 7px;
+            margin: 5px 5px 0px 0px;
+        }
 
-    #suggestions {
-      position: absolute;
-      background-color: white;
-      border: 1px solid #ddd;
-      max-height: 150px;
-      overflow-y: auto;
-      width: 200px;
-      z-index: 1000;
-    }
+        #suggestions {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+            width: 200px;
+            z-index: 1000;
+        }
 
-    #suggestions div {
-      padding: 5px;
-      border-bottom: 1px solid #eee;
-    }
+        #suggestions div {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
 
-    #suggestions div:hover {
-      background-color: #f8f8f8;
-    }
+        #suggestions div:hover {
+            background-color: #f8f8f8;
+        }
 
-    .neighborhood-label {
-      background-color: #b2d8d8;
-      font-size: 12px;
-      padding: 5px;
-      border-radius: 20px;
-      margin: 2px;
-    }
+        .neighborhood-label {
+            background-color: #b2d8d8;
+            font-size: 12px;
+            padding: 5px;
+            border-radius: 20px;
+            margin: 2px;
+        }
 
-    .filter_container {
-      display: flex;
-      justify-content: flex-start;
-      margin: 10px;
-      margin-bottom: 50px;
-      gap: 50px;
-    }
+        .filter_container {
+            display: flex;
+            justify-content: flex-start;
+            margin: 10px;
+            margin-bottom: 50px;
+            gap: 50px;
+        }
 
-    #neighborhood-dropdown-button {
-      background-color: #66b2b2;
-      color: white;
-      border: 3px solid #004c4c;
-      border-radius: 5px;
-      border: none;
-      padding: 5px 7px;
-      margin: 5px 5px 0px 0px;
-    }
+        #neighborhood-dropdown-button {
+            background-color: #66b2b2;
+            color: white;
+            border: 3px solid #004c4c;
+            border-radius: 5px;
+            border: none;
+            padding: 5px 7px;
+            margin: 5px 5px 0px 0px;
+        }
 
-    .delete-neighborhood-button {
-      cursor: pointer;
-      border-radius: 50%;
-      background-color: grey;
-      color: white;
-      border: none;
-      width: 15px;
-      height: 15px;
-      font-size: 10px;
-      padding: 1px;
-      line-height: 1;
+        .delete-neighborhood-button {
+            cursor: pointer;
+            border-radius: 50%;
+            background-color: grey;
+            color: white;
+            border: none;
+            width: 15px;
+            height: 15px;
+            font-size: 10px;
+            padding: 1px;
+            line-height: 1;
 
-    }
+        }
 
-    #flex-container {
-      display: inline-flex;
-      flex-direction: row;
-    }
-  </style>
+        #flex-container {
+            display: inline-flex;
+            flex-direction: row;
+        }
+    </style>
 
 
 </head>
 
 <body>
 
-  <div>
-    <h1>Pittsburgh Food Finder</h1>
-    <h3> Filters</h3>
-  </div>
-
-  <div class="filter_container">
-    <div style="margin-right: 50px;">
-      <p>Activity</p>
-      <div class="filter-container" style="height:50px"></div>
+    <div>
+        <h1>Pittsburgh Food Finder</h1>
+        <h3> Filters</h3>
     </div>
 
-    <div style="margin-right: 100px;">
-      <p>Neighborhoods</p>
-      <button id="neighborhood-dropdown-button">Neighborhoods
-        <i>&#x25BE;</i>
-      </button>
-      <div id="neighborhood-buttons">
-        <select multiple id="selectButton"></select>
-      </div>
-      <div id="selected-neighborhoods"></div>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-      <p>Restaurants</p>
-      <input type="text" id="searchBox" style="width: 200px; height:30px" placeholder="Type to search...">
-      <button id="searchButton">Search</button>
-      <div id="suggestions"></div>
-    </div>
-  </div>
-
-  <div>
-    <div id="flex-container">
-      <div>
-        <div id="map-container" style="width:650px; height:400px">
+    <div class="filter_container">
+        <div style="margin-right: 50px;">
+            <p>Activity</p>
+            <div class="filter-container" style="height:50px"></div>
         </div>
-        <div id="tooltip" class="tooltip" style="display: none;"></div>
-      </div>
-      <div>
-        <p style="margin-left:100px;">Restaurant Recommendations</p>
-        <svg id="network-diagram" width="800px" height="800px"></svg>
-        <div id="recommendations" width="800px"></div>
-      </div>
+
+        <div style="margin-right: 100px;">
+            <p>Neighborhoods</p>
+            <button id="neighborhood-dropdown-button">Neighborhoods
+                <i>&#x25BE;</i>
+            </button>
+            <div id="neighborhood-buttons">
+                <select multiple id="selectButton"></select>
+            </div>
+            <div id="selected-neighborhoods"></div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <p>Restaurants</p>
+            <input type="text" id="searchBox" style="width: 200px; height:30px" placeholder="Type to search...">
+            <button id="searchButton">Search</button>
+            <div id="suggestions"></div>
+        </div>
     </div>
-  </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
-    </script>
+    <div>
+        <div id="flex-container">
+            <div>
+                <div id="map-container" style="width:650px; height:400px">
+                </div>
+                <div id="tooltip" class="tooltip" style="display: none;"></div>
+            </div>
+            <div>
+                <p style="margin-left:100px;">Restaurant Recommendations</p>
+                <svg id="network-diagram" width="800px" height="800px"></svg>
+                <div id="recommendations" width="800px"></div>
+            </div>
+        </div>
+    </div>
 
-  <script>
-    const drawPittsburgh = async () => {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
+        </script>
 
-      //load data 
-      let pitt = await d3.json(".././static/pittsburgh.geojson");
-      let cityData_unfiltered = await d3.csv(".././static/yelp_pittsburgh.csv");
+    <script>
+        const drawPittsburgh = async () => {
 
-      //removed restaurants with no neighborhood
-      let cityData = cityData_unfiltered.filter(d => d.neighborhood !== "");
+            //load data 
+            let pitt = await d3.json(".././static/pittsburgh.geojson");
+            let cityData_unfiltered = await d3.csv(".././static/yelp_pittsburgh.csv");
 
-      cityData.forEach((d, i) => {
-        d['latitude'] = Number(d['latitude'])
-        d['longitude'] = Number(d['longitude'])
-        d['rating'] = Number(d['rating'])
-        d['review count'] = Number(d['review count'])
-        // d.position = projection([d.longitude, d.latitude])
-      })
+            //removed restaurants with no neighborhood
+            let cityData = cityData_unfiltered.filter(d => d.neighborhood !== "");
 
-      //create leaflet map
-      let map = L.map('map-container').setView([40.440624, -79.995888], 13).fitBounds(L.geoJson(pitt).getBounds());;
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(map);
+            cityData.forEach((d, i) => {
+                d['latitude'] = Number(d['latitude'])
+                d['longitude'] = Number(d['longitude'])
+                d['rating'] = Number(d['rating'])
+                d['review count'] = Number(d['review count'])
+                // d.position = projection([d.longitude, d.latitude])
+            })
 
-      L.svg({ clickable: true }).addTo(map)
+            //create leaflet map
+            let map = L.map('map-container').setView([40.440624, -79.995888], 13).fitBounds(L.geoJson(pitt).getBounds());;
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
 
-      let overlay = d3.select(map.getPanes().overlayPane)
-      let svg = overlay.select('svg').attr("pointer-events", "auto")
+            L.svg({ clickable: true }).addTo(map)
 
-      let markerWidth = 50;
-      let markerHeight = 80;
+            let overlay = d3.select(map.getPanes().overlayPane)
+            let svg = overlay.select('svg').attr("pointer-events", "auto")
 
-      function createMarkers(data) {
-        // create markers on the map for all the available restaurant
-        let data_markers = svg.selectAll("image")
-          .data(data)
-          .join('image')
-          .attr('xlink:href', '.././static/marker.png')
-          .attr("width", markerWidth)
-          .attr("height", markerHeight)
-          .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
-          .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight)
-          .on("click", clickRestaurant);
+            let markerWidth = 50;
+            let markerHeight = 80;
 
-        const tooltip = svg.append("g")
-          .attr("class", "tooltip")
-          .style("display", "none");
+            function createMarkers(data) {
+                // create markers on the map for all the available restaurant
+                let data_markers = svg.selectAll("image")
+                    .data(data)
+                    .join('image')
+                    .attr('xlink:href', '.././static/marker.png')
+                    .attr("width", markerWidth)
+                    .attr("height", markerHeight)
+                    .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
+                    .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight)
+                    .on("click", clickRestaurant);
 
-        tooltip.append("rect")
-          .attr("width", 250)
-          .attr("height", 100)
-          .attr("fill", "white")
-          .attr("stroke", "#66b2b2")
-          .attr("stroke-width", "2px")
+                const tooltip = svg.append("g")
+                    .attr("class", "tooltip")
+                    .style("display", "none");
 
-        tooltip.append("text")
-          .attr("id", "text1")
-          .attr("x", 125)
-          .attr("y", 20)
-          .attr("text-anchor", "middle")
-          .style("font-size", "11px")
-          .style("font-weight", "bold")
-        // .style("font-family",'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif)
+                tooltip.append("rect")
+                    .attr("width", 250)
+                    .attr("height", 100)
+                    .attr("fill", "white")
+                    .attr("stroke", "#66b2b2")
+                    .attr("stroke-width", "2px")
 
-        tooltip.append("text")
-          .attr("id", "text2")
-          .attr("x", 125)
-          .attr("y", 20)
-          .attr("text-anchor", "middle")
-          .style("font-size", "10px")
-          .style("font-weight", "bold")
+                tooltip.append("text")
+                    .attr("id", "text1")
+                    .attr("x", 125)
+                    .attr("y", 20)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "11px")
+                    .style("font-weight", "bold")
+                // .style("font-family",'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif)
 
-        tooltip.append("text")
-          .attr("id", "text3")
-          .attr("x", 125)
-          .attr("y", 20)
-          .attr("text-anchor", "middle")
-          .style("font-size", "10px")
-          .style("font-weight", "bold")
+                tooltip.append("text")
+                    .attr("id", "text2")
+                    .attr("x", 125)
+                    .attr("y", 20)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "10px")
+                    .style("font-weight", "bold")
 
-        tooltip.append("text")
-          .attr("id", "text4")
-          .attr("x", 125)
-          .attr("y", 20)
-          .attr("text-anchor", "middle")
-          .style("font-size", "10px")
-          .style("font-weight", "bold")
+                tooltip.append("text")
+                    .attr("id", "text3")
+                    .attr("x", 125)
+                    .attr("y", 20)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "10px")
+                    .style("font-weight", "bold")
 
-        tooltip.append("text")
-          .attr("id", "text5")
-          .attr("x", 125)
-          .attr("y", 20)
-          .attr("text-anchor", "middle")
-          .style("font-size", "9px")
-          .style("font-weight", "bold")
+                tooltip.append("text")
+                    .attr("id", "text4")
+                    .attr("x", 125)
+                    .attr("y", 20)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "10px")
+                    .style("font-weight", "bold")
 
-        // add hover tooltip to the markers with name of restaurant
-        data_markers.on("mouseover", function (event, d) {
-          d3.select(this)
-            .raise()
-            .transition()
-            .duration("150")
-            .attr("width", markerWidth * 1.2)
-            .attr("height", markerHeight * 1.2)
-            .attr("x", map.latLngToLayerPoint([d.latitude, d.longitude]).x - (markerWidth * 1.2) / 2)
-            .attr("y", map.latLngToLayerPoint([d.latitude, d.longitude]).y - (markerHeight * 1.2));
-          tooltip.raise();
-          tooltip.style("display", null)
-            .attr("transform", "translate(" +
-              (map.latLngToLayerPoint([d.latitude, d.longitude]).x + 15) + "," +
-              (map.latLngToLayerPoint([d.latitude, d.longitude]).y - 40) + ")");
+                tooltip.append("text")
+                    .attr("id", "text5")
+                    .attr("x", 125)
+                    .attr("y", 20)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "9px")
+                    .style("font-weight", "bold")
 
-          tooltip.select("#text1").text(d.name);
-          tooltip.select("#text2").text("Neighborhood: " + d.neighborhood).attr("x", 125).attr("y", 40).attr("text-anchor", "middle")
-          tooltip.select("#text3").text("Type: " + d.type).attr("x", 125).attr("y", 55).attr("text-anchor", "middle")
-          tooltip.select("#text4").text("Rating: " + d.rating).attr("x", 125).attr("y", 70).attr("text-anchor", "middle")
-          tooltip.select("#text5").text("Number of Reviews: " + d["review count"]).attr("x", 125).attr("y", 85).attr("text-anchor", "middle")
-        })
-          .on('mouseout', function (event, d) {
-            d3.select(this)
-              .transition()
-              .duration('150')
-              .attr("width", markerWidth)
-              .attr("height", markerHeight)
-              .attr("x", map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
-              .attr("y", map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
-            tooltip.style("display", "none");
-          });
+                // add hover tooltip to the markers with name of restaurant
+                data_markers.on("mouseover", function (event, d) {
+                    d3.select(this)
+                        .raise()
+                        .transition()
+                        .duration("150")
+                        .attr("width", markerWidth * 1.2)
+                        .attr("height", markerHeight * 1.2)
+                        .attr("x", map.latLngToLayerPoint([d.latitude, d.longitude]).x - (markerWidth * 1.2) / 2)
+                        .attr("y", map.latLngToLayerPoint([d.latitude, d.longitude]).y - (markerHeight * 1.2));
+                    tooltip.raise();
+                    tooltip.style("display", null)
+                        .attr("transform", "translate(" +
+                            (map.latLngToLayerPoint([d.latitude, d.longitude]).x + 15) + "," +
+                            (map.latLngToLayerPoint([d.latitude, d.longitude]).y - 40) + ")");
 
-        let update = () => {
-          data_markers
-            .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
-            .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
-        };
+                    tooltip.select("#text1").text(d.name);
+                    tooltip.select("#text2").text("Neighborhood: " + d.neighborhood).attr("x", 125).attr("y", 40).attr("text-anchor", "middle")
+                    tooltip.select("#text3").text("Type: " + d.type).attr("x", 125).attr("y", 55).attr("text-anchor", "middle")
+                    tooltip.select("#text4").text("Rating: " + d.rating).attr("x", 125).attr("y", 70).attr("text-anchor", "middle")
+                    tooltip.select("#text5").text("Number of Reviews: " + d["review count"]).attr("x", 125).attr("y", 85).attr("text-anchor", "middle")
+                })
+                    .on('mouseout', function (event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration('150')
+                            .attr("width", markerWidth)
+                            .attr("height", markerHeight)
+                            .attr("x", map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
+                            .attr("y", map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
+                        tooltip.style("display", "none");
+                    });
 
-        map.on("zoomend", update);
-        map.on("moveend", update);
+                let update = () => {
+                    data_markers
+                        .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
+                        .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
+                };
 
-        update();
-      }
+                map.on("zoomend", update);
+                map.on("moveend", update);
 
-      createMarkers(cityData);
+                update();
+            }
 
-
-
-      let filter_container = d3.select(".filter-container")
-
-      let categories_list = new Set();
-      let type_list = new Set();
-
-      for (i = 0; i < cityData.length; i++) {
-        let curr = cityData[i];
-        if (!categories_list.has(curr.category)) {
-          categories_list.add(curr.category);
-        }
-        if (!type_list.has(curr.type)) {
-          type_list.add(curr.type);
-        }
-      }
-
-      // console.log(categories_list);
-      // console.log(type_list);
-
-      filter_container.selectAll("button")
-        .data(type_list)
-        .join()
-        .append("button")
-        .text(d => d)
-        .attr("class", "type_button")
-        .on("click", clickType);
-
-      let filter = new Set();
-
-      function clickType() {
-        typeButton = d3.select(this);
-        currType = typeButton.datum()
-
-        if (filter.has(currType)) {
-          filter.delete(currType);
-          typeButton.attr("class", "type_button")
-        }
-        else {
-          filter.add(currType);
-          typeButton.attr("class", "selected-type")
-        }
-
-        const filteredData = cityData.filter(d => filter.has(d.type));
-
-        let neighborhood = d3.select(".neighborhood-label");
-
-        if (!neighborhood.empty() && filteredData.length > 0) {
-          updatePoints(filteredData, neighborhood.text());
-        }
-        else if (!neighborhood.empty() && filteredData.length === 0) {
-          updatePoints(filteredData, neighborhood.text());
-        }
-        else {
-          updatePoints(filteredData);
-        }
-      }
-
-      const fuseOptions = {
-        keys: ["name"],
-        includeScore: true
-      };
-      const fuse = new Fuse(cityData, fuseOptions);
-      console.log(fuse._docs)
-      //   updatePoints(fuse._docs)
-
-      console.log(fuse);
-      function searchAndZoom() {
-        const searchTerm = d3.select('#searchBox').property('value').trim();
-        const results = fuse.search(searchTerm);
-
-        if (results.length > 0) {
-          const restaurant = results[0].item;
-          map.setView([restaurant.latitude, restaurant.longitude], 20);
-        } else {
-          alert("Restaurant not found.");
-        }
-      }
+            createMarkers(cityData);
 
 
-      function updateSuggestions() {
-        const inputVal = d3.select("#searchBox").property("value").trim().toLowerCase();
 
-        const matches = cityData.filter(d => d.name.toLowerCase().startsWith(inputVal));
+            let filter_container = d3.select(".filter-container")
 
-        const suggestionsDiv = d3.select("#suggestions");
+            let categories_list = new Set();
+            let type_list = new Set();
 
-        if (inputVal && matches.length > 0) {
-          suggestionsDiv.style("display", null);
+            for (i = 0; i < cityData.length; i++) {
+                let curr = cityData[i];
+                if (!categories_list.has(curr.category)) {
+                    categories_list.add(curr.category);
+                }
+                if (!type_list.has(curr.type)) {
+                    type_list.add(curr.type);
+                }
+            }
 
-          suggestionsDiv.selectAll("div")
-            .data(matches, d => d.name)
-            .join(
-              enter =>
-                enter
-                  .append("div")
-                  .text(d => d.name)
-                  .on("click", function (event, d) {
-                    d3.select("#searchBox").property("value", d.name);
+            // console.log(categories_list);
+            // console.log(type_list);
+
+            filter_container.selectAll("button")
+                .data(type_list)
+                .join()
+                .append("button")
+                .text(d => d)
+                .attr("class", "type_button")
+                .on("click", clickType);
+
+            let filter = new Set();
+
+            function clickType() {
+                typeButton = d3.select(this);
+                currType = typeButton.datum()
+
+                if (filter.has(currType)) {
+                    filter.delete(currType);
+                    typeButton.attr("class", "type_button")
+                }
+                else {
+                    filter.add(currType);
+                    typeButton.attr("class", "selected-type")
+                }
+
+                const filteredData = cityData.filter(d => filter.has(d.type));
+
+                let neighborhood = d3.select(".neighborhood-label");
+
+                if (!neighborhood.empty() && filteredData.length > 0) {
+                    updatePoints(filteredData, neighborhood.text());
+                }
+                else if (!neighborhood.empty() && filteredData.length === 0) {
+                    updatePoints(filteredData, neighborhood.text());
+                }
+                else {
+                    updatePoints(filteredData);
+                }
+            }
+
+            const fuseOptions = {
+                keys: ["name"],
+                includeScore: true
+            };
+            const fuse = new Fuse(cityData, fuseOptions);
+            console.log(fuse._docs)
+            //   updatePoints(fuse._docs)
+
+            console.log(fuse);
+            function searchAndZoom() {
+                const searchTerm = d3.select('#searchBox').property('value').trim();
+                const results = fuse.search(searchTerm);
+
+                if (results.length > 0) {
+                    const restaurant = results[0].item;
+                    map.setView([restaurant.latitude, restaurant.longitude], 20);
+                } else {
+                    alert("Restaurant not found.");
+                }
+            }
+
+
+            function updateSuggestions() {
+                const inputVal = d3.select("#searchBox").property("value").trim().toLowerCase();
+
+                const matches = cityData.filter(d => d.name.toLowerCase().startsWith(inputVal));
+
+                const suggestionsDiv = d3.select("#suggestions");
+
+                if (inputVal && matches.length > 0) {
+                    suggestionsDiv.style("display", null);
+
+                    suggestionsDiv.selectAll("div")
+                        .data(matches, d => d.name)
+                        .join(
+                            enter =>
+                                enter
+                                    .append("div")
+                                    .text(d => d.name)
+                                    .on("click", function (event, d) {
+                                        d3.select("#searchBox").property("value", d.name);
+                                        suggestionsDiv.style("display", "none");
+
+                                        searchAndZoom();
+                                    }),
+                            update => update.text(d => d.name),
+                            exit => exit.remove()
+                        );
+                } else {
                     suggestionsDiv.style("display", "none");
-
-                    searchAndZoom();
-                  }),
-              update => update.text(d => d.name),
-              exit => exit.remove()
-            );
-        } else {
-          suggestionsDiv.style("display", "none");
-        }
-      }
-
-      d3.select("#searchBox").on("input", updateSuggestions);
-
-
-      d3.select('#searchButton').on("click", (event) => {
-        searchAndZoom();
-      });
-
-
-      let neighborhoods = [...new Set(cityData.map(d => d.neighborhood))];
-      d3.select("#selectButton")
-        .selectAll('myOptions')
-        .data(neighborhoods)
-        .join('option')
-        .text(d => d)
-        .attr("value", d => d);
-
-      d3.select("#neighborhood-buttons").style("display", "none");
-
-      function showDropdown() {
-        let displayStatus = d3.select("#neighborhood-buttons").style("display");
-        d3.select("#neighborhood-buttons").style("display", displayStatus === "none" ? "block" : "none");
-      }
-
-      d3.select("#neighborhood-dropdown-button").on("click", showDropdown);
-
-      let panel = d3.select("#selected-neighborhoods")
-      panel.append("p").text("Neighborhood Selected").attr("class", "filter_label")
-
-      let hasLabel = false;
-
-      //update the map if there are selections
-      d3.select("#selectButton").on("change", function (d) {
-        let selectedOptions = d3.select(this)
-          .selectAll("option:checked")
-          .nodes()
-
-
-        if (hasLabel === false) {
-          let selectedValues = selectedOptions.map(option => option.value);
-
-          updateLabels(selectedValues);
-          updatePoints(cityData.filter(d => d.neighborhood === selectedValues[0]), selectedValues[0]);
-
-          hasLabel = true;
-        }
-
-        // let filteredData = cityData.filter(d => selectedValues.includes(d.neighborhood));
-        // console.log(filteredData);
-
-        // updatePoints(filteredData);
-
-        // for (let i of selectedValues) {
-        //   if (d3.select("i")) {
-        //     panel.append("text")
-        //       .text(i)
-        //       .attr("class", "neighborhood-label")
-        //       .attr("id", i);
-        //   }
-
-        // }
-
-        // panel.selectAll(".neighborhood-label")
-        //   .each(function () {
-        //     var id = d3.select(this).attr("id");
-        //     if (!selectedValues.includes(id)) {
-        //       d3.select(this).remove();
-        //     }
-        //   });
-
-        // console.log(selectedValues[0].length);
-        // let label = d3.select(".neighborhood-label");
-        // console.log(label);
-        // label.append("circle")
-        //   .attr("cx", selectedValues[0].length + 10)
-        //   .attr("cy",)
-        //   .attr("r", 5)
-        //   .style("fill", "red")
-        //   .style("cursor", "pointer")
-        //   .on("click", function () {
-        //     group.remove();
-        //   });
-      })
-
-      function updateLabels(selectedValues) {
-        const container = panel.selectAll(".neighborhood-label-container")
-          .data(selectedValues, d => d);
-
-        const neighborhood_container = container.enter()
-          .append("div")
-          .attr("class", "neighborhood-label-container");
-
-        neighborhood_container.append("span")
-          .attr("class", "neighborhood-label")
-          .text(d => d);
-
-        neighborhood_container.append("button")
-          .attr("class", "delete-neighborhood-button")
-          .text("X")
-          .on("click", function (event, d) {
-            d3.select(".neighborhood-label-container").remove();
-            selectedValues = [];
-            updatePoints(cityData);
-            hasLabel = false;
-          });
-      }
-
-
-      function updatePoints(filteredData, neighborhood = "all") {
-        console.log(neighborhood);
-        //if no neighborhood is specified and want to show all points 
-        if (neighborhood === "all") {
-          // console.log(filteredData);
-          if (filteredData.length === 0) {
-            filteredData = cityData.slice();
-          }
-
-          svg.selectAll("image").remove();
-
-          createMarkers(filteredData);
-        }
-        //if neighborhood is specified
-        else {
-          let neighborhood_data = cityData.filter(d => d.neighborhood === neighborhood);
-          if (filteredData.length === 0) {
-            filteredData = neighborhood_data;
-          }
-          let final_data = neighborhood_data.filter(d => filteredData.includes(d) === true);
-
-          svg.selectAll("image").remove();
-
-          createMarkers(final_data);
-
-        }
-      }
-
-      // let markers = data_markers
-      //   .data(filteredData, d => d.key);
-      // markers
-      //   .transition()
-      //   .duration(200)
-      //   .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
-      //   .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
-
-      // markers
-      //   .enter()
-      //   .append("image")
-      //   .attr('xlink:href', 'marker.png')
-      //   .attr("width", markerWidth)
-      //   .attr("height", markerHeight)
-      //   .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
-      //   .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
-
-      // markers
-      //   .exit()
-      //   // .transition()
-      //   // .duration(200)
-      //   .remove();
-      // // }
-
-      function calculateSimilarity(location1, location2) {
-        const latitudeSimilarity = Math.abs(location1.latitude - location2.latitude);
-        const longitudeSimilarity = Math.abs(location1.longitude - location2.longitude);
-        const typeSimilarity = location1.type === location2.type ? 1 : 0;
-        const neighborhoodSimilarity = location1.neighborhood === location2.neighborhood ? 1 : 0;
-        const categorySimilarity = location1.category === location2.category ? 1 : 0
-
-        return (latitudeSimilarity + longitudeSimilarity + typeSimilarity + neighborhoodSimilarity + categorySimilarity) / 5;
-      }
-
-      const network = d3.select("#network-diagram");
-      const netWidth = network.attr("width")
-      const netHeight = network.attr("height")
-
-
-      function updateNetwork(close) {
-        const updatedNodes = close.map(index => cityData[index]);
-
-        const updatedLinks = [];
-        for (let i = 0; i < updatedNodes.length; i++) {
-          for (let j = i + 1; j < updatedNodes.length; j++) {
-            const similarity = calculateSimilarity(updatedNodes[i], updatedNodes[j]);
-            updatedLinks.push({ source: i, target: j });
-          }
-        }
-        sim.nodes(updatedNodes);
-        sim.force("link").links(updatedLinks);
-        sim.alpha(1).restart();
-      }
-
-      let sim;
-      let clicked = 0
-      function clickRestaurant() {
-
-        clicked += 1;
-        restaurantName = d3.select(this).datum().name
-        console.log(restaurantName)
-
-        const clickedNodeIndex = cityData.findIndex((element) => element.name === restaurantName);
-
-        const similarityMatrix = [];
-        for (let i = 0; i < cityData.length; i++) {
-          const row = [];
-          for (let j = 0; j < cityData.length; j++) {
-            const similarityScore = calculateSimilarity(cityData[i], cityData[j]);
-            row.push(similarityScore);
-          }
-          similarityMatrix.push(row);
-        }
-
-        const clickedNodeSimilarityScores = similarityMatrix[clickedNodeIndex];
-        const closestNodes = clickedNodeSimilarityScores
-          .map((score, index) => ({ index: index, score: score }))
-          .sort((a, b) => b.score - a.score) // Sort in descending order of similarity score
-          .slice(1, 11) // Exclude the clicked node itself and select top k nodes
-          .map(entry => entry.index);
-
-        const similarityScores = {};
-
-        console.log(closestNodes, "hi");
-        closestNodes.forEach(entry => {
-          const rname = cityData[entry].name;
-          const similarityScore = similarityMatrix[clickedNodeIndex][entry];
-          similarityScores[rname] = similarityScore;
-        });
-
-        console.log("sim", similarityScores)
-
-        const mostSimilar = closestNodes.map(index => cityData[index]);
-        console.log(mostSimilar)
-
-        mostSimilar.forEach(d => {
-          d.score = similarityScores[d.name]
-        })
-
-        console.log("new", mostSimilar)
-
-        const radiusExtent = d3.extent(mostSimilar, d => d.score)
-        const radiusScale = d3.scaleLinear().domain([0, 1]).range([0, 4])
-
-        console.log("scaled")
-        console.log(mostSimilar)
-        if (clicked > 1) {
-          updateNetwork(closestNodes);
-        }
-
-        const links = [];
-        for (let i = 0; i < mostSimilar.length; i++) {
-          for (let j = i + 1; j < mostSimilar.length; j++) {
-            const similarity = calculateSimilarity(mostSimilar[i], mostSimilar[j]);
-            links.push({ source: i, target: j });
-          }
-        }
-
-        console.log(links)
-
-        sim = d3.forceSimulation(mostSimilar)
-          .force("charge", d3.forceManyBody().strength(-100))
-          .force("center", d3.forceCenter(netWidth / 2, netHeight / 2))
-          .force("link", d3.forceLink(links).distance(100))
-          .on("tick", render);
-
-        function centerOnNode(clickedNodeIndex) {
-          const clickedNode = cityData[clickedNodeIndex];
-          sim.force("center", d3.forceCenter(clickedNode.x, clickedNode.y));
-        }
-
-        centerOnNode(clickedNodeIndex)
-
-        function render() {
-          centerX = 250 - 100
-          centerY = 150
-          let lines = network.selectAll("line.link")
-            .data(links)
-            .join((enter) =>
-              enter
-                .append("line")
-                .attr("class", "link")
-                .attr("stroke", "#333"))
-            .attr("x1", d => d.source.x + centerX)
-            .attr("y1", d => d.source.y + centerY)
-            .attr("x2", d => d.target.x + centerX)
-            .attr("y2", d => d.target.y + centerY);
-
-          let circles = network.selectAll("circle.node")
-            .data(mostSimilar)
-            .join((enter) =>
-              enter
-                .append("circle")
-                .attr("id", d => "circle" + d.index)
-                .attr("class", "node")
-                .attr("stroke", "darkgrey")
-                .attr("fill", "red")
-                .attr("stroke-width", 1)
-                .attr("r", d => radiusScale(d.rating))
-                .attr("cx", centerX)
-                .attr("cy", centerY)
-            )
-            .attr("transform", function (d) {
-              return "translate(" + d.x + "," + d.y + ")"
-            })
-            .on('mouseover', function (d) {
-              d3.select("#name" + d3.select(this).datum().index)
-                .style("fill", "#66b2b2")
-                .transition()
-                .duration(20)
-
-              d3.select(this).style("fill", "#66b2b2")
-                .transition()
-                .duration(100)
-
-              network.append("rect")
-                .attr("id", "display-rectangle")
-                .attr("x", 30)
-                .attr("y", 300)
-                .attr("width", 400)
-                .attr("height", 230)
-                .attr("fill", "white")
-                .attr("stroke", "#66b2b2")
-                .attr("stroke-width", "2px")
-
-              function createText(text, y, fill, font = "12px") {
-                network.append("text")
-                  .text(text)
-                  .attr("class", "net-display")
-                  .attr("x", 220)
-                  .attr("y", y)
-                  .attr("text-anchor", "middle")
-                  .attr("font-size", font)
-                  .attr("font-weight", "bold")
-                  .attr("fill", fill)
-              }
-
-              createText("The selected restaurant is", 330, "#66b2b2")
-              createText(restaurantName, 350, "#004c4c", "14px")
-              createText("Similar Restaurant:", 380, "#66b2b2")
-              createText(d3.select(this).datum().name, 400, "#004c4c", "14px")
-              createText("Neighborhood: " + d3.select(this).datum().neighborhood, 430, "#66b2b2")
-              createText("Type: " + capitalizeFirstLetter(d3.select(this).datum().type), 450, "#66b2b2")
-              createText("Category: " + capitalizeFirstLetter(d3.select(this).datum().category), 470, "#66b2b2")
-              createText("Rating: " + d3.select(this).datum().rating, 490, "#66b2b2")
-              createText("Similarity: " + d3.select(this).datum().score.toFixed(3), 510, "#66b2b2")
-
-              const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
-              if (restaurant) {
-                d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
-                  .transition()
-                  .duration('150')
-                  .attr("width", markerWidth * 2)
-                  .attr("height", markerHeight * 2)
-                  .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - (markerWidth * 2) / 2)
-                  .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - (markerHeight * 2));
-              }
-
-            })
-            .on("mouseout", function (d) {
-              d3.select("#display-rectangle").remove()
-              d3.select("#name" + d3.select(this).datum().index)
-                .style("fill", "black")
-              d3.selectAll(".net-display").remove();
-              const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
-              if (restaurant) {
-                d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
-                  .transition()
-                  .duration('150')
-                  .attr("width", markerWidth)
-                  .attr("height", markerHeight)
-                  .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - markerWidth / 2)
-                  .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - markerHeight);
-
-                d3.select(this).style("fill", "red")
-                  .transition()
-                  .duration(100)
-              }
-            })
-
-
-
-        }
-
-        function capitalizeFirstLetter(string) {
-          return string.trim().charAt(0).toUpperCase() + string.trim().slice(1);
-        }
-
-        network.selectAll("text")
-          .data(mostSimilar)
-          .join("text")
-          .attr("x", 300)
-          .attr("y", function (d, i) {
-            return 50 + i * 25
-          })
-          .attr("id", d => "name" + d.index)
-          .text(d => d.name)
-          .attr("font-size", "11px")
-          .on("mouseover", function () {
-            d3.select("#circle" + d3.select(this).datum().index)
-              .style("fill", "#66b2b2")
-            d3.select(this).style("fill", "#66b2b2")
-              .transition()
-              .duration(100)
-
-            network.append("rect")
-              .attr("id", "display-rectangle")
-              .attr("x", 500)
-              .attr("y", 10)
-              .attr("width", 180)
-              .attr("height", 280)
-              .attr("fill", "white")
-              .attr("stroke", "#66b2b2")
-              .attr("stroke-width", "2px")
-
-            function createText(text, y, fill, font = "12px") {
-              network.append("text")
-                .text(capitalizeFirstLetter(text))
-                .attr("class", "net-display")
-                .attr("x", 595)
-                .attr("y", y)
-                .attr("text-anchor", "middle")
-                .attr("font-size", font)
-                .attr("font-weight", "bold")
-                .attr("fill", fill)
+                }
             }
 
-            createText("The selected restaurant is", 50, "#66b2b2")
-            createText(restaurantName, 70, "#004c4c")
-            createText("Similar Restaurant:", 90, "#66b2b2")
-            createText(d3.select(this).datum().name, 120, "#004c4c", "14px")
-            createText("Neighborhood: " + d3.select(this).datum().neighborhood, 150, "#66b2b2")
-            createText("Type: " + d3.select(this).datum().type, 170, "#66b2b2")
-            createText("Category: " + capitalizeFirstLetter(d3.select(this).datum().category), 190, "#66b2b2")
-            createText("Rating: " + d3.select(this).datum().rating, 210, "#66b2b2")
-            createText("Similarity: " + d3.select(this).datum().score.toFixed(3), 230, "#66b2b2")
+            d3.select("#searchBox").on("input", updateSuggestions);
 
-            const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
-            if (restaurant) {
-              d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
-                .transition()
-                .duration('150')
-                .attr("width", markerWidth * 2)
-                .attr("height", markerHeight * 2)
-                .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - (markerWidth * 2) / 2)
-                .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - (markerHeight * 2));
+
+            d3.select('#searchButton').on("click", (event) => {
+                searchAndZoom();
+            });
+
+
+            let neighborhoods = [...new Set(cityData.map(d => d.neighborhood))];
+            d3.select("#selectButton")
+                .selectAll('myOptions')
+                .data(neighborhoods)
+                .join('option')
+                .text(d => d)
+                .attr("value", d => d);
+
+            d3.select("#neighborhood-buttons").style("display", "none");
+
+            function showDropdown() {
+                let displayStatus = d3.select("#neighborhood-buttons").style("display");
+                d3.select("#neighborhood-buttons").style("display", displayStatus === "none" ? "block" : "none");
             }
-          })
-          .on("mouseout", function () {
-            d3.select("#circle" + d3.select(this).datum().index)
-              .style("fill", "red")
-            d3.select(this).style("fill", "black")
-              .transition()
-              .duration(100)
 
-            d3.select("#display-rectangle").remove()
+            d3.select("#neighborhood-dropdown-button").on("click", showDropdown);
 
-            d3.selectAll(".net-display").remove();
-            const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
-            if (restaurant) {
-              d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
-                .transition()
-                .duration('150')
-                .attr("width", markerWidth)
-                .attr("height", markerHeight)
-                .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - markerWidth / 2)
-                .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - markerHeight);
+            let panel = d3.select("#selected-neighborhoods")
+            panel.append("p").text("Neighborhood Selected").attr("class", "filter_label")
+
+            let hasLabel = false;
+
+            //update the map if there are selections
+            d3.select("#selectButton").on("change", function (d) {
+                let selectedOptions = d3.select(this)
+                    .selectAll("option:checked")
+                    .nodes()
+
+
+                if (hasLabel === false) {
+                    let selectedValues = selectedOptions.map(option => option.value);
+
+                    updateLabels(selectedValues);
+                    updatePoints(cityData.filter(d => d.neighborhood === selectedValues[0]), selectedValues[0]);
+
+                    hasLabel = true;
+                }
+
+                // let filteredData = cityData.filter(d => selectedValues.includes(d.neighborhood));
+                // console.log(filteredData);
+
+                // updatePoints(filteredData);
+
+                // for (let i of selectedValues) {
+                //   if (d3.select("i")) {
+                //     panel.append("text")
+                //       .text(i)
+                //       .attr("class", "neighborhood-label")
+                //       .attr("id", i);
+                //   }
+
+                // }
+
+                // panel.selectAll(".neighborhood-label")
+                //   .each(function () {
+                //     var id = d3.select(this).attr("id");
+                //     if (!selectedValues.includes(id)) {
+                //       d3.select(this).remove();
+                //     }
+                //   });
+
+                // console.log(selectedValues[0].length);
+                // let label = d3.select(".neighborhood-label");
+                // console.log(label);
+                // label.append("circle")
+                //   .attr("cx", selectedValues[0].length + 10)
+                //   .attr("cy",)
+                //   .attr("r", 5)
+                //   .style("fill", "red")
+                //   .style("cursor", "pointer")
+                //   .on("click", function () {
+                //     group.remove();
+                //   });
+            })
+
+            function updateLabels(selectedValues) {
+                const container = panel.selectAll(".neighborhood-label-container")
+                    .data(selectedValues, d => d);
+
+                const neighborhood_container = container.enter()
+                    .append("div")
+                    .attr("class", "neighborhood-label-container");
+
+                neighborhood_container.append("span")
+                    .attr("class", "neighborhood-label")
+                    .text(d => d);
+
+                neighborhood_container.append("button")
+                    .attr("class", "delete-neighborhood-button")
+                    .text("X")
+                    .on("click", function (event, d) {
+                        d3.select(".neighborhood-label-container").remove();
+                        selectedValues = [];
+                        updatePoints(cityData);
+                        hasLabel = false;
+                    });
             }
-          })
-      }
-    }
 
-    drawPittsburgh();
 
-  </script>
+            function updatePoints(filteredData, neighborhood = "all") {
+                console.log(neighborhood);
+                //if no neighborhood is specified and want to show all points 
+                if (neighborhood === "all") {
+                    // console.log(filteredData);
+                    if (filteredData.length === 0) {
+                        filteredData = cityData.slice();
+                    }
+
+                    svg.selectAll("image").remove();
+
+                    createMarkers(filteredData);
+                }
+                //if neighborhood is specified
+                else {
+                    let neighborhood_data = cityData.filter(d => d.neighborhood === neighborhood);
+                    if (filteredData.length === 0) {
+                        filteredData = neighborhood_data;
+                    }
+                    let final_data = neighborhood_data.filter(d => filteredData.includes(d) === true);
+
+                    svg.selectAll("image").remove();
+
+                    createMarkers(final_data);
+
+                }
+            }
+
+            // let markers = data_markers
+            //   .data(filteredData, d => d.key);
+            // markers
+            //   .transition()
+            //   .duration(200)
+            //   .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
+            //   .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
+
+            // markers
+            //   .enter()
+            //   .append("image")
+            //   .attr('xlink:href', 'marker.png')
+            //   .attr("width", markerWidth)
+            //   .attr("height", markerHeight)
+            //   .attr("x", d => map.latLngToLayerPoint([d.latitude, d.longitude]).x - markerWidth / 2)
+            //   .attr("y", d => map.latLngToLayerPoint([d.latitude, d.longitude]).y - markerHeight);
+
+            // markers
+            //   .exit()
+            //   // .transition()
+            //   // .duration(200)
+            //   .remove();
+            // // }
+
+            function calculateSimilarity(location1, location2) {
+                const latitudeSimilarity = Math.abs(location1.latitude - location2.latitude);
+                const longitudeSimilarity = Math.abs(location1.longitude - location2.longitude);
+                const typeSimilarity = location1.type === location2.type ? 1 : 0;
+                const neighborhoodSimilarity = location1.neighborhood === location2.neighborhood ? 1 : 0;
+                const categorySimilarity = location1.category === location2.category ? 1 : 0
+
+                return (latitudeSimilarity + longitudeSimilarity + typeSimilarity + neighborhoodSimilarity + categorySimilarity) / 5;
+            }
+
+            const network = d3.select("#network-diagram");
+            const netWidth = network.attr("width")
+            const netHeight = network.attr("height")
+
+
+            function updateNetwork(close) {
+                const updatedNodes = close.map(index => cityData[index]);
+
+                const updatedLinks = [];
+                for (let i = 0; i < updatedNodes.length; i++) {
+                    for (let j = i + 1; j < updatedNodes.length; j++) {
+                        const similarity = calculateSimilarity(updatedNodes[i], updatedNodes[j]);
+                        updatedLinks.push({ source: i, target: j });
+                    }
+                }
+                sim.nodes(updatedNodes);
+                sim.force("link").links(updatedLinks);
+                sim.alpha(1).restart();
+            }
+
+            let sim;
+            let clicked = 0
+            function clickRestaurant() {
+
+                clicked += 1;
+                restaurantName = d3.select(this).datum().name
+                console.log(restaurantName)
+
+                const clickedNodeIndex = cityData.findIndex((element) => element.name === restaurantName);
+
+                const similarityMatrix = [];
+                for (let i = 0; i < cityData.length; i++) {
+                    const row = [];
+                    for (let j = 0; j < cityData.length; j++) {
+                        const similarityScore = calculateSimilarity(cityData[i], cityData[j]);
+                        row.push(similarityScore);
+                    }
+                    similarityMatrix.push(row);
+                }
+
+                const clickedNodeSimilarityScores = similarityMatrix[clickedNodeIndex];
+                const closestNodes = clickedNodeSimilarityScores
+                    .map((score, index) => ({ index: index, score: score }))
+                    .sort((a, b) => b.score - a.score) // Sort in descending order of similarity score
+                    .slice(1, 11) // Exclude the clicked node itself and select top k nodes
+                    .map(entry => entry.index);
+
+                const similarityScores = {};
+
+                console.log(closestNodes, "hi");
+                closestNodes.forEach(entry => {
+                    const rname = cityData[entry].name;
+                    const similarityScore = similarityMatrix[clickedNodeIndex][entry];
+                    similarityScores[rname] = similarityScore;
+                });
+
+                console.log("sim", similarityScores)
+
+                const mostSimilar = closestNodes.map(index => cityData[index]);
+                console.log(mostSimilar)
+
+                mostSimilar.forEach(d => {
+                    d.score = similarityScores[d.name]
+                })
+
+                console.log("new", mostSimilar)
+
+                const radiusExtent = d3.extent(mostSimilar, d => d.score)
+                const radiusScale = d3.scaleLinear().domain([0, 1]).range([0, 4])
+
+                console.log("scaled")
+                console.log(mostSimilar)
+                if (clicked > 1) {
+                    updateNetwork(closestNodes);
+                }
+
+                const links = [];
+                for (let i = 0; i < mostSimilar.length; i++) {
+                    for (let j = i + 1; j < mostSimilar.length; j++) {
+                        const similarity = calculateSimilarity(mostSimilar[i], mostSimilar[j]);
+                        links.push({ source: i, target: j });
+                    }
+                }
+
+                console.log(links)
+
+                sim = d3.forceSimulation(mostSimilar)
+                    .force("charge", d3.forceManyBody().strength(-100))
+                    .force("center", d3.forceCenter(netWidth / 2, netHeight / 2))
+                    .force("link", d3.forceLink(links).distance(100))
+                    .on("tick", render);
+
+                function centerOnNode(clickedNodeIndex) {
+                    const clickedNode = cityData[clickedNodeIndex];
+                    sim.force("center", d3.forceCenter(clickedNode.x, clickedNode.y));
+                }
+
+                centerOnNode(clickedNodeIndex)
+
+                function render() {
+                    centerX = 250 - 100
+                    centerY = 150
+                    let lines = network.selectAll("line.link")
+                        .data(links)
+                        .join((enter) =>
+                            enter
+                                .append("line")
+                                .attr("class", "link")
+                                .attr("stroke", "#333"))
+                        .attr("x1", d => d.source.x + centerX)
+                        .attr("y1", d => d.source.y + centerY)
+                        .attr("x2", d => d.target.x + centerX)
+                        .attr("y2", d => d.target.y + centerY);
+
+                    let circles = network.selectAll("circle.node")
+                        .data(mostSimilar)
+                        .join((enter) =>
+                            enter
+                                .append("circle")
+                                .attr("id", d => "circle" + d.index)
+                                .attr("class", "node")
+                                .attr("stroke", "darkgrey")
+                                .attr("fill", "red")
+                                .attr("stroke-width", 1)
+                                .attr("r", d => radiusScale(d.rating))
+                                .attr("cx", centerX)
+                                .attr("cy", centerY)
+                        )
+                        .attr("transform", function (d) {
+                            return "translate(" + d.x + "," + d.y + ")"
+                        })
+                        .on('mouseover', function (d) {
+                            d3.select("#name" + d3.select(this).datum().index)
+                                .style("fill", "#66b2b2")
+                                .transition()
+                                .duration(20)
+
+                            d3.select(this).style("fill", "#66b2b2")
+                                .transition()
+                                .duration(100)
+
+                            network.append("rect")
+                                .attr("id", "display-rectangle")
+                                .attr("x", 30)
+                                .attr("y", 300)
+                                .attr("width", 400)
+                                .attr("height", 230)
+                                .attr("fill", "white")
+                                .attr("stroke", "#66b2b2")
+                                .attr("stroke-width", "2px")
+
+                            function createText(text, y, fill, font = "12px") {
+                                network.append("text")
+                                    .text(text)
+                                    .attr("class", "net-display")
+                                    .attr("x", 220)
+                                    .attr("y", y)
+                                    .attr("text-anchor", "middle")
+                                    .attr("font-size", font)
+                                    .attr("font-weight", "bold")
+                                    .attr("fill", fill)
+                            }
+
+                            createText("The selected restaurant is", 330, "#66b2b2")
+                            createText(restaurantName, 350, "#004c4c", "14px")
+                            createText("Similar Restaurant:", 380, "#66b2b2")
+                            createText(d3.select(this).datum().name, 400, "#004c4c", "14px")
+                            createText("Neighborhood: " + d3.select(this).datum().neighborhood, 430, "#66b2b2")
+                            createText("Type: " + capitalizeFirstLetter(d3.select(this).datum().type), 450, "#66b2b2")
+                            createText("Category: " + capitalizeFirstLetter(d3.select(this).datum().category), 470, "#66b2b2")
+                            createText("Rating: " + d3.select(this).datum().rating, 490, "#66b2b2")
+                            createText("Similarity: " + d3.select(this).datum().score.toFixed(3), 510, "#66b2b2")
+
+                            const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
+                            if (restaurant) {
+                                d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
+                                    .transition()
+                                    .duration('150')
+                                    .attr("width", markerWidth * 2)
+                                    .attr("height", markerHeight * 2)
+                                    .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - (markerWidth * 2) / 2)
+                                    .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - (markerHeight * 2));
+                            }
+
+                        })
+                        .on("mouseout", function (d) {
+                            d3.select("#display-rectangle").remove()
+                            d3.select("#name" + d3.select(this).datum().index)
+                                .style("fill", "black")
+                            d3.selectAll(".net-display").remove();
+                            const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
+                            if (restaurant) {
+                                d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
+                                    .transition()
+                                    .duration('150')
+                                    .attr("width", markerWidth)
+                                    .attr("height", markerHeight)
+                                    .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - markerWidth / 2)
+                                    .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - markerHeight);
+
+                                d3.select(this).style("fill", "red")
+                                    .transition()
+                                    .duration(100)
+                            }
+                        })
+
+
+
+                }
+
+                function capitalizeFirstLetter(string) {
+                    return string.trim().charAt(0).toUpperCase() + string.trim().slice(1);
+                }
+
+                network.selectAll("text")
+                    .data(mostSimilar)
+                    .join("text")
+                    .attr("x", 300)
+                    .attr("y", function (d, i) {
+                        return 50 + i * 25
+                    })
+                    .attr("id", d => "name" + d.index)
+                    .text(d => d.name)
+                    .attr("font-size", "11px")
+                    .on("mouseover", function () {
+                        d3.select("#circle" + d3.select(this).datum().index)
+                            .style("fill", "#66b2b2")
+                        d3.select(this).style("fill", "#66b2b2")
+                            .transition()
+                            .duration(100)
+
+                        network.append("rect")
+                            .attr("id", "display-rectangle")
+                            .attr("x", 30)
+                            .attr("y", 300)
+                            .attr("width", 400)
+                            .attr("height", 230)
+                            .attr("fill", "white")
+                            .attr("stroke", "#66b2b2")
+                            .attr("stroke-width", "2px")
+
+                        function createText(text, y, fill, font = "12px") {
+                            network.append("text")
+                                .text(capitalizeFirstLetter(text))
+                                .attr("class", "net-display")
+                                .attr("x", 220)
+                                .attr("y", y)
+                                .attr("text-anchor", "middle")
+                                .attr("font-size", font)
+                                .attr("font-weight", "bold")
+                                .attr("fill", fill)
+                        }
+
+                        createText("The selected restaurant is", 330, "#66b2b2")
+                        createText(restaurantName, 350, "#004c4c", "14px")
+                        createText("Similar Restaurant:", 380, "#66b2b2")
+                        createText(d3.select(this).datum().name, 400, "#004c4c", "14px")
+                        createText("Neighborhood: " + d3.select(this).datum().neighborhood, 430, "#66b2b2")
+                        createText("Type: " + capitalizeFirstLetter(d3.select(this).datum().type), 450, "#66b2b2")
+                        createText("Category: " + capitalizeFirstLetter(d3.select(this).datum().category), 470, "#66b2b2")
+                        createText("Rating: " + d3.select(this).datum().rating, 490, "#66b2b2")
+                        createText("Similarity: " + d3.select(this).datum().score.toFixed(3), 510, "#66b2b2")
+
+
+                        const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
+                        if (restaurant) {
+                            d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
+                                .transition()
+                                .duration('150')
+                                .attr("width", markerWidth * 2)
+                                .attr("height", markerHeight * 2)
+                                .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - (markerWidth * 2) / 2)
+                                .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - (markerHeight * 2));
+                        }
+                    })
+                    .on("mouseout", function () {
+                        d3.select("#circle" + d3.select(this).datum().index)
+                            .style("fill", "red")
+                        d3.select(this).style("fill", "black")
+                            .transition()
+                            .duration(100)
+
+                        d3.select("#display-rectangle").remove()
+
+                        d3.selectAll(".net-display").remove();
+                        const restaurant = cityData.find(restaurant => restaurant.name === d3.select(this).datum().name)
+                        if (restaurant) {
+                            d3.select("#image" + restaurant["review count"] + restaurant.type + restaurant.neighborhood.replace(/\s+/g, '-').split('.').join(""))
+                                .transition()
+                                .duration('150')
+                                .attr("width", markerWidth)
+                                .attr("height", markerHeight)
+                                .attr("x", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).x - markerWidth / 2)
+                                .attr("y", map.latLngToLayerPoint([restaurant.latitude, restaurant.longitude]).y - markerHeight);
+                        }
+                    })
+            }
+        }
+
+        drawPittsburgh();
+
+    </script>
 </body>
 
 </html>
