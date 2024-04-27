@@ -36,7 +36,7 @@
 
 <body>
     <h1 class="kalam-bold">The Importance of Understanding Mental Health</h1>
-    <svg id="canvas" width="1680" height="800"></svg>
+    <svg id="canvas" width="1350" height="800"></svg>
     <svg id="isochart" width="500" height="600"></svg>
     <svg id="brain" width="1680" height="1100"></svg>
 
@@ -55,35 +55,35 @@
             svg.append("image")
                 .attr("xlink:href", "./static/background2.jpeg")
                 .attr("x", 0)
-                .attr("y", 40)
+                .attr("y", -30)
                 .attr("width", svg.attr("width"))
                 .attr("height", svg.attr("height"));
 
             let other = svg.append("image")
                 .attr("xlink:href", "./static/other.png")
                 .attr("x", 1900)
-                .attr("y", roadY + 730)
+                .attr("y", roadY + 600)
                 .attr("width", 100)
                 .attr("height", 180);
 
             let student = svg.append("image")
                 .attr("xlink:href", "./static/student.png")
                 .attr("x", -200)
-                .attr("y", roadY + 740)
+                .attr("y", roadY + 600)
                 .attr("width", 120)
                 .attr("height", 220);
 
             let businessman = svg.append("image")
                 .attr("xlink:href", "./static/businessman.png")
                 .attr("x", -300)
-                .attr("y", roadY + 770)
+                .attr("y", roadY + 620)
                 .attr("width", 180)
                 .attr("height", 260);
 
             let housewife = svg.append("image")
                 .attr("xlink:href", "./static/housewife.png")
                 .attr("x", 1800)
-                .attr("y", roadY + 780)
+                .attr("y", roadY + 640)
                 .attr("width", 200)
                 .attr("height", 250);
 
@@ -204,8 +204,8 @@
 
                 let svg = d3.select("#canvas");
                 let iconWidth = 20;
-                let iconHeight = 40;
-                let padding = 5;
+                let iconHeight = 30;
+                let padding = 2;
 
                 let index1 = 0;
                 let index2 = 0; 
@@ -222,13 +222,13 @@
                         let extra = count % 10000
 
                         group.append("text")
-                            .attr("x", 1100)
+                            .attr("x", 900)
                             .attr("y", yPosition1 - 15)
                             .text(occupation + " (" + count + ")")
                             .attr("font-weight", "bold");
 
                         for (let i = 0; i <= ratio; i++) {
-                            let x = (i % 10) * (iconWidth + padding) + 1100;
+                            let x = (i % 10) * (iconWidth + padding) + 900;
                             let y = yPosition1 + Math.floor(i / 10) * (iconHeight + padding);
                             if (i < ratio) {
                                 group.append("image")
@@ -269,13 +269,13 @@
                         let extra = count % 10000
 
                         group.append("text")
-                            .attr("x", 1370)
+                            .attr("x", 1100)
                             .attr("y", yPosition2 - 18)
                             .text(occupation + " (" + count + ")")
                             .attr("font-weight", "bold");
 
                         for (let i = 0; i <= ratio; i++) {
-                            let x = (i % 10) * (iconWidth + padding) + 1370;
+                            let x = (i % 10) * (iconWidth + padding) + 1100;
                             let y = yPosition2 + Math.floor(i / 10) * (iconHeight + padding) - 5;
                             if (i < ratio) {
                                 group.append("image")
