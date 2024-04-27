@@ -1,786 +1,324 @@
 <html>
 
 <head>
-    <title>INFO 5311: Homework 4</title>
+    <title>INFO 5311: Final Project</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        body {
-            background-image: url(".././static/hollywood.png");
-            background-size: 100%;
-            padding: 0px;
+        h1 {
+            text-align: center;
+            font-size: 40px;
         }
 
-        .header {
-            font-size: 20px;
-            font-weight: bold;
-            background-color: white;
-            color: black;
-            border-radius: 5px;
-            border: none;
+        #pauseBtn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
         }
 
-        .option {
-            display: block;
-            padding: 3px 5px 0 25px;
-        }
-
-        #headerBar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50;
-        }
-
-        #fail-filters {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50;
-        }
-
-        .filter-button {
-            background-color: #30302c;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        .thought-bubble {
             font-size: 16px;
-            margin: 1px 10px;
+            fill: #000;
+            pointer-events: none;
         }
 
-        .filter-button:hover {
-            background-color: #ebe6d4;
-            color: black;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        .kalam-bold {
+            font-family: "Kalam", cursive;
+            font-weight: 700;
+            font-style: normal;
+            color: #21354a;
         }
 
-
-        rect.overlay {
-            stroke: black;
+        body {
+            background-color: #87b9f8;
         }
-
-        rect.selection {
-            stroke: none;
-            fill: steelblue;
-            fill-opacity: 0.6;
-        }
-
     </style>
 </head>
 
 <body>
-    <div>
-        <svg id="intro" width="1350" height="1100"></svg>
-    </div>
-
-    <div id="headerBar" width="1350" height="100"></div>
-    <div id="button-container" width="1350" height="100"></div>
-    <div id="fail-filters" width="1350" height="100"></div>
-
-    <svg id="bubble" width="1350" height="1100"></svg>
+    <h1 class="kalam-bold">The Importance of Understanding Mental Health</h1>
+    <svg id="canvas" width="1680" height="800"></svg>
+    <svg id="isochart" width="500" height="600"></svg>
+    <svg id="brain" width="1680" height="1100"></svg>
 
     <script>
-        const movieVisualization = async () => {
+        const mentalHealthVisualization = async () => {
 
-            let movieData = await d3.csv(".././static/movies_with_gender.csv");
+            let mentalHealthData = await d3.csv("./static/mental_health_data.csv");
+            console.log(mentalHealthData);
 
-            let femaleDirectedMovies = [];
-            let maleDirectedMovies = [];
+            let svg = d3.select("#canvas");
+            let speed = 0.05;
 
-            let fPassed = 0;
-            let mPassed = 0;
-
-            // separate female directed movies and male directed movies and how much each side passed
-            movieData.forEach(row => {
-                if (row.female === "True") {
-                    femaleDirectedMovies.push(row);
-                    if (row.binary === "PASS") {
-                        fPassed++;
-                    }
-                }
-                else if (row.female === "False") {
-                    maleDirectedMovies.push(row);
-                    if (row.binary === "PASS") {
-                        mPassed++;
-                    }
-                }
-            })
-
-            //add cluster value to know which cluster the circle belongs to
-            movieData.forEach(d => {
-                if (d.female === "True" && d.binary === "PASS") {
-                    d.cluster = 1;
-                } else if (d.female === "True" && d.binary === "FAIL") {
-                    d.cluster = 2;
-                } else if (d.female === "False" && d.binary === "PASS") {
-                    d.cluster = 3;
-                } else if (d.female === "False" && d.binary === "FAIL") {
-                    d.cluster = 4;
-                }
-            });
-
-
-            let svg = d3.select("svg#intro");
-            let height = svg.attr("height");
-            let width = svg.attr("width");
-
-            svg.append("text")
-                .attr("x", width / 2)
-                .attr("y", 60)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .text("Measuring Hollywood's Gender Bias");
-
-            svg.append("rect")
-                .attr("x", 150)
-                .attr("y", 100)
-                .attr("width", 1100)
-                .attr("height", 320)
-                .attr("rx", 20)
-                .attr("ry", 20)
-                .attr("fill", "white");
-
-            svg.append("text")
-                .attr("x", 700)
-                .attr("y", 145)
-                .attr("text-anchor", "middle")
-                .style("font-size", "20px")
-                .style("font-weight", "bold")
-                .text("The Bechdel Test is a test that measures the representation of women in films and other fiction.");
-
-            svg.append("line")
-                .attr("x1", 250)
-                .attr("y1", 165)
-                .attr("x2", 1150)
-                .attr("y2", 165)
-                .attr("stroke", "black")
-                .attr("stroke-width", 1);
-
-            svg.append("text")
-                .attr("x", 700)
-                .attr("y", 220)
-                .attr("text-anchor", "middle")
-                .style("font-size", "20px")
-                .style("font-weight", "bold")
-                .text("In order to pass the Bechdel Test, there are 3 criteria that must be met");
-
-            svg.append("text")
-                .attr("x", 700)
-                .attr("y", 270)
-                .attr("text-anchor", "middle")
-                .style("font-size", "20px")
-                .style("font-weight", "bold")
-                .text("1. At least two women are featured");
-
-            svg.append("text")
-                .attr("x", 700)
-                .attr("y", 320)
-                .attr("text-anchor", "middle")
-                .style("font-size", "20px")
-                .style("font-weight", "bold")
-                .text("2. The women talk to each other");
-
-            svg.append("text")
-                .attr("x", 700)
-                .attr("y", 370)
-                .attr("text-anchor", "middle")
-                .style("font-size", "20px")
-                .style("font-weight", "bold")
-                .text("3. The conversation is about something other than a man");
-
-            svg.append("text")
-                .attr("x", width / 2)
-                .attr("y", 500)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .text("Original Graph");
-
-
-            svg.append("rect")
-                .attr("x", 420)
-                .attr("y", 560)
-                .attr("width", 500)
-                .attr("height", 400)
-                .attr("rx", 20)
-                .attr("ry", 20)
-                .attr("fill", "white");
+            let roadX = 0;
+            let roadY = -250;
 
             svg.append("image")
-                .attr("xlink:href", ".././static/original_graph.png")
-                .attr("x", 445)
-                .attr("y", 585)
-                .attr("width", 450)
-                .attr("height", 350);
+                .attr("xlink:href", "./static/background2.jpeg")
+                .attr("x", 0)
+                .attr("y", 40)
+                .attr("width", svg.attr("width"))
+                .attr("height", svg.attr("height"));
 
-            let header = d3.select("#headerBar");
-            let headerWidth = header.attr("width")
+            let other = svg.append("image")
+                .attr("xlink:href", "./static/other.png")
+                .attr("x", 1900)
+                .attr("y", roadY + 730)
+                .attr("width", 100)
+                .attr("height", 180);
 
-            header.append("text")
-                .attr("x", headerWidth / 2)
-                .attr("y", 50)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .text("Female vs Male Directed Movies");
+            let student = svg.append("image")
+                .attr("xlink:href", "./static/student.png")
+                .attr("x", -200)
+                .attr("y", roadY + 740)
+                .attr("width", 120)
+                .attr("height", 220);
 
+            let businessman = svg.append("image")
+                .attr("xlink:href", "./static/businessman.png")
+                .attr("x", -300)
+                .attr("y", roadY + 770)
+                .attr("width", 180)
+                .attr("height", 260);
 
-            // start creating filter bar
-
-            let filterBar = d3.select("#button-container");
-            let filterWidth = filterBar.attr("width");
-
-            filterBar.append("text")
-                .attr("x", filterWidth / 2)
-                .attr("y", 50)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .text("Filters: ");
-
-
-            let originalFilterOptions = ["all", "pass", "fail"];
-
-            originalFilterOptions.forEach((option, index) => {
-                filterBar.append("button")
-                    .text(option.charAt(0).toUpperCase() + option.slice(1))
-                    .attr("class", `filter-button`)
-                    .style("left", `${index * 100}px`)
-                    .style("top", "10px")
-                    .on("click", () => filterCircles(option));
-            })
+            let housewife = svg.append("image")
+                .attr("xlink:href", "./static/housewife.png")
+                .attr("x", 1800)
+                .attr("y", roadY + 780)
+                .attr("width", 200)
+                .attr("height", 250);
 
 
-
-
-            // start creating bubble graph 
-            let graph = d3.select("svg#bubble");
-            let graphHeight = graph.attr("height");
-            let graphWidth = graph.attr("width");
-
-            graph.append("text")
-                .attr("x", graphWidth / 2 - 440)
-                .attr("y", 130)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .text("Female Directed");
-
-            graph.append("text")
-                .attr("x", graphWidth / 2 + 220)
-                .attr("y", 50)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .text("Male Directed");
-
-            let femaleDirectedPassed;
-            let femaleDirectedFailed;
-            let maleDirectedPassed;
-            let maleDirectedFailed
-
-            function countCircles() {
-                let totalCircles = d3.selectAll("circle").size();
-
-                femaleDirectedPassed = movieData.filter(d => d.female === "True" && d.binary === "PASS").length;
-
-                femaleDirectedFailed = movieData.filter(d => d.female === "True" && d.binary === "FAIL").length;
-
-                maleDirectedPassed = movieData.filter(d => d.female === "False" && d.binary === "PASS").length;
-
-                maleDirectedFailed = movieData.filter(d => d.female === "False" && d.binary === "FAIL").length;
-
-                graph.append("text")
-                    .attr("x", graphWidth / 2 - 440)
-                    .attr("y", 180)
-                    .attr("id", "female-count")
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "25px")
-                    .style("font-weight", "bold")
-                    .style("font-family", "Impact")
-                    .text(`original passing: ${femaleDirectedPassed}`);
-
-                graph.append("text")
-                    .attr("x", graphWidth / 2 - 440)
-                    .attr("y", 220)
-                    .attr("id", "female-count")
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "25px")
-                    .style("font-weight", "bold")
-                    .style("font-family", "Impact")
-                    .text(`original failing: ${femaleDirectedFailed}`);
-
-                graph.append("text")
-                    .attr("x", graphWidth / 2 + 220)
-                    .attr("y", 100)
-                    .attr("id", "male-count")
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "25px")
-                    .style("font-weight", "bold")
-                    .style("font-family", "Impact")
-                    .text(`original passing: ${maleDirectedPassed}`);
-
-                graph.append("text")
-                    .attr("x", graphWidth / 2 + 220)
-                    .attr("y", 140)
-                    .attr("id", "male-count")
-                    .attr("text-anchor", "middle")
-                    .style("font-size", "25px")
-                    .style("font-weight", "bold")
-                    .style("font-family", "Impact")
-                    .text(`original failing: ${maleDirectedFailed}`);
-            }
-
-            countCircles();
-
-
-            const clusterCenters = {
-                femalePass: { x: graphWidth / 4 - 50, y: graphHeight / 2 - 200 },
-                femaleFail: { x: graphWidth / 4 + 50, y: graphHeight / 2 - 200 },
-                malePass: { x: 3 * graphWidth / 4 - 200, y: graphHeight / 2 - 100 },
-                maleFail: { x: 3 * graphWidth / 4, y: graphHeight / 2 - 100 }
-            };
-
-            const timeClusters = [
-                { value: 0, range: [1970, 1974] },
-                { value: 1, range: [1975, 1979] },
-                { value: 2, range: [1980, 1984] },
-                { value: 3, range: [1985, 1989] },
-                { value: 4, range: [1990, 1994] },
-                { value: 5, range: [1995, 1999] },
-                { value: 6, range: [2000, 2004] },
-                { value: 7, range: [2005, 2009] },
-                { value: 8, range: [2010, 2013] },
+            const characters = [
+                { char: other, xStart: 1800, xEnd: -200, pause: false },
+                { char: student, xStart: -200, xEnd: 1700, pause: false },
+                { char: businessman, xStart: -1000, xEnd: 1700, pause: true },
+                { char: housewife, xStart: 1900, xEnd: -200, pause: true },
             ];
 
-            const simulation = d3.forceSimulation(movieData)
-                .force("charge", d3.forceManyBody().strength(d => {
-                    if (d.female === "True") {
-                        return -2;
-                    } else {
-                        return -4;
-                    }
-                }))
-                .force("collision", d3.forceCollide().radius(7))
-                .force("x", d3.forceX().x(d => {
-                    if (d.female === "True" && d.binary === "PASS") {
-                        return clusterCenters.femalePass.x;
-                    } else if (d.female === "True" && d.binary === "FAIL") {
-                        return clusterCenters.femaleFail.x;
-                    } else if (d.female === "False" && d.binary === "PASS") {
-                        return clusterCenters.malePass.x;
-                    } else {
-                        return clusterCenters.maleFail.x;
-                    }
-                }))
-                .force("y", d3.forceY().y(d => {
-                    if (d.female === "True" && d.binary === "PASS") {
-                        return clusterCenters.femalePass.y;
-                    } else if (d.female === "True" && d.binary === "FAIL") {
-                        return clusterCenters.femaleFail.y;
-                    } else if (d.female === "False" && d.binary === "PASS") {
-                        return clusterCenters.malePass.y;
-                    } else {
-                        return clusterCenters.maleFail.y;
-                    }
-                }))
-                .on("tick", ticked);
+            characters.forEach(char => {
+                let character = char.char;
 
-            const circles = graph.selectAll("circle")
-                .data(movieData)
-                .enter().append("circle")
-                .attr("r", 5)
-                .attr("fill", d => d.binary === "FAIL" ? "#d8504d" : "green")
-                .on("mouseover", function (event, d) {
-
-                    const tooltip = d3.select("body").append("div")
-                        .attr("class", "tooltip")
-                        .style("opacity", 0)
-                        .style("position", "absolute")
-                        .style("background", "lightgrey")
-                        .style("border", "solid")
-                        .style("border-width", "1px")
-                        .style("border-radius", "5px")
-                        .style("padding", "10px");
-
-                    d3.select(this)
-                        .attr("r", 10);
-
-                    d3.select(this)
-                        .transition()
-                        .duration(200)
-                        .style("stroke", "gold")
-                        .style("stroke-width", "2px");
-
-                    d3.selectAll("circle").transition().style("opacity", 0.5);
-                    d3.select(this).transition().style("opacity", 1);
-
-                    tooltip.transition()
-                        .duration(200)
-                        .style("opacity", .9);
-
-
-                    tooltip.selectAll("*").remove();
-
-                    tooltip.append("div").text(`Title: ${d.title}`);
-                    tooltip.append("div").text(`Director: ${d.director}`);
-                    tooltip.append("div").text(`Year: ${d.year}`);
-                    tooltip.append("div").text(`Passed Bechdel Test: ${d.binary === "PASS" ? "Yes" : "No"}`);
-                    if (d.binary === "FAIL") {
-                        tooltip.append("div").text(`Reason for Failing: ${d.test}`);
-                    }
-
-                    tooltip
-                        .style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY + 10) + "px")
-                        .style("opacity", 0.9);
-                })
-                .on("mouseout", function (d) {
-                    d3.select(this)
-                        .attr("r", 5);
-
-                    d3.select(this)
-                        .transition()
-                        .duration(200)
-                        .style("stroke", "none");
-
-                    d3.selectAll("circle").transition().style("opacity", 1);
-
-                    d3.select("body").selectAll(".tooltip").remove();
-                });
-
-
-            function ticked() {
-                d3.selectAll("circle")
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y);
-            }
-
-            let failFilterButtons = d3.select("#fail-filters");
-            let failFilterButtonsWidth = failFilterButtons.attr("width");
-            let yearStart;
-            let yearEnd;
-
-            function filterCircles(filter) {
-                let yearMovieData = movieData.filter(d => {
-                    return d.year >= yearStart && d.year <= yearEnd;
-                })
-                let filteredData;
-
-                if (filter === 'all') {
-                    filteredData = yearMovieData;
-                    d3.selectAll('.fail-filter-button').remove();
-                }
-                else if (filter === "pass") {
-                    filteredData = yearMovieData.filter(d => d.binary === "PASS");
-                    d3.selectAll('.fail-filter-button').remove();
-                }
-                else if (filter === "fail") {
-                    filteredData = yearMovieData.filter(d => d.binary === "FAIL");
-
-                    let filterOptionsMapping = {
-                        "notalk": "No Talking",
-                        "men": "Talked About Men",
-                        "nowomen": "Less than 2 women"
-                    };
-
-                    if (d3.selectAll('.fail-filter-button').empty()) {
-                        failFilterButtons.append("text")
-                            .attr("x", filterWidth / 2)
-                            .attr("y", 50)
-                            .attr("class", "fail-filter-button")
-                            .attr("text-anchor", "middle")
-                            .style("font-size", "35px")
-                            .style("font-weight", "bold")
-                            .style("font-family", "Impact")
-                            .text("Filter Bechdel Test Failure: ");
-
-                        Object.entries(filterOptionsMapping).forEach(([option, displayText], index) => {
-                            failFilterButtons.append("button")
-                                .text(displayText)
-                                .attr("class", `filter-button fail-filter-button`)
-                                .style("margin", "5px")
-                                .on("click", function () { filterCircles(option); });
-                        });
-                    }
+                if (char.pause === true) {
+                    console.log("entered");
+                    setTimeout(() => {
+                        initiateWalk(character, char.xStart, char.xEnd, char.pause);
+                    }, 10000);
                 }
                 else {
-                    filteredData = movieData.filter(d => d.binary === "FAIL" && d.test && d.test.startsWith(filter));
+                    initiateWalk(character, char.xStart, char.xEnd, char.pause);
                 }
 
-                //remove current circles
-                graph.selectAll("circle").remove();
-
-                //add circles with test criteria filters added
-                let updateCircles = graph.selectAll("circle")
-                    .data(filteredData, d => d.id);
-
-                updateCircles.enter().append("circle")
-                    .attr("r", 5)
-                    .merge(updateCircles)
-                    .attr("fill", d => d.binary === "FAIL" ? "#d8504d" : "green")
-                    .on("mouseover", function (event, d) {
-
-                        const tooltip = d3.select("body").append("div")
-                            .attr("class", "tooltip")
-                            .style("opacity", 0)
-                            .style("position", "absolute")
-                            .style("background", "lightgrey")
-                            .style("border", "solid")
-                            .style("border-width", "1px")
-                            .style("border-radius", "5px")
-                            .style("padding", "10px");
-
-                        d3.select(this)
-                            .attr("r", 10);
-
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .style("stroke", "gold")
-                            .style("stroke-width", "2px");
-
-                        d3.selectAll("circle").transition().style("opacity", 0.5);
-                        d3.select(this).transition().style("opacity", 1);
-                        tooltip.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-
-
-                        tooltip.selectAll("*").remove();
-
-                        tooltip.append("div").text(`Title: ${d.title}`);
-                        tooltip.append("div").text(`Director: ${d.director}`);
-                        tooltip.append("div").text(`Year: ${d.year}`);
-                        tooltip.append("div").text(`Passed Bechdel Test: ${d.binary === "PASS" ? "Yes" : "No"}
-                    `);
-                        if (d.binary === "FAIL") {
-                            tooltip.append("div").text(`Reason for Failing: ${d.test}`);
-                        }
-
-                        tooltip
-                            .style("left", (event.pageX + 10) + "px")
-                            .style("top", (event.pageY + 10) + "px")
-                            .style("opacity", 0.9);
-                    })
-                    .on("mouseout", function () {
-                        d3.select("body").selectAll(".tooltip").remove();
-
-                        d3.select(this)
-                            .attr("r", 5);
-
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .style("stroke", "none");
-
-                        d3.selectAll("circle").transition().style("opacity", 1);
-                    });
-
-                simulation.nodes(filteredData)
-                    .on("tick", ticked)
-                    .alpha(1)
-                    .restart();
-            }
-
-
-            function updateBubbleGraph(v1, v2) {
-                let filteredData = movieData.filter(d => {
-                    if (d.year >= v1 && d.year <= v2) {
-                        return d;
-                    }
+                character.on("mouseover", function () {
+                    d3.select(this).interrupt();
+                    showThoughtBubble(this);
                 })
-
-                console.log(filteredData);
-
-                graph.selectAll("circle").remove();
-
-                let updateCircles = graph.selectAll("circle")
-                    .data(filteredData, d => d.id);
-
-                updateCircles.enter().append("circle")
-                    .attr("r", 5)
-                    .merge(updateCircles)
-                    .attr("fill", d => d.binary === "FAIL" ? "#d8504d" : "green")
-                    .on("mouseover", function (event, d) {
-
-                        const tooltip = d3.select("body").append("div")
-                            .attr("class", "tooltip")
-                            .style("opacity", 0)
-                            .style("position", "absolute")
-                            .style("background", "lightgrey")
-                            .style("border", "solid")
-                            .style("border-width", "1px")
-                            .style("border-radius", "5px")
-                            .style("padding", "10px");
-
-                        d3.select(this)
-                            .attr("r", 10);
-
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .style("stroke", "gold")
-                            .style("stroke-width", "2px");
-
-                        d3.selectAll("circle").transition().style("opacity", 0.5);
-                        d3.select(this).transition().style("opacity", 1);
-                        tooltip.transition()
-                            .duration(200)
-                            .style("opacity", .9);
-
-
-                        tooltip.selectAll("*").remove();
-
-                        tooltip.append("div").text(`Title: ${d.title}`);
-                        tooltip.append("div").text(`Director: ${d.director}`);
-                        tooltip.append("div").text(`Year: ${d.year}`);
-                        tooltip.append("div").text(`Passed Bechdel Test: ${d.binary === "PASS" ? "Yes" : "No"}
-                    `);
-                        if (d.binary === "FAIL") {
-                            tooltip.append("div").text(`Reason for Failing: ${d.test}`);
-                        }
-
-                        tooltip
-                            .style("left", (event.pageX + 10) + "px")
-                            .style("top", (event.pageY + 10) + "px")
-                            .style("opacity", 0.9);
-                    })
                     .on("mouseout", function () {
-                        d3.select("body").selectAll(".tooltip").remove();
-
-                        d3.select(this)
-                            .attr("r", 5);
-
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .style("stroke", "none");
-
-                        d3.selectAll("circle").transition().style("opacity", 1);
+                        resumeWalk(this, char.xEnd);
+                        hideThoughtBubble();
+                    })
+                    .on("click", function () {
+                        characterClicked();
                     });
 
-                simulation.nodes(filteredData)
-                    .on("tick", ticked)
-                    .alpha(1)
-                    .restart();
+            });
+
+            function initiateWalk(character, xStart, xEnd, pause) {
+                let totalDistance = Math.abs(xEnd - xStart);
+                let duration = totalDistance / speed;
+                walk(character, xEnd, duration);
             }
 
+            function resumeWalk(element, xEnd) {
+                let character = d3.select(element);
+                let currentX = parseFloat(character.attr("x"));
+                let remainingDistance = Math.abs(xEnd - currentX);
+                let duration = remainingDistance / speed;
+                walk(character, xEnd, duration);
+            }
 
-            filterBar.append("text")
-                .attr("x", filterWidth / 2 + 200)
-                .attr("y", 100)
-                .attr("text-anchor", "middle")
-                .style("font-size", "35px")
-                .style("font-weight", "bold")
-                .style("font-family", "Impact")
-                .style("margin-left", "50px")
-                .text("Year: ");
+            function walk(character, xEnd, duration) {
+                character.transition()
+                    .duration(duration)
+                    .attr("x", xEnd)
+                    .ease(d3.easeLinear)
+                    .on("end", () => resetAndWalkAgain(character, xEnd));
+            }
 
-            let yearExtent = d3.extent(movieData, d => d.year);
-            slider_snap(yearExtent[0], yearExtent[1], "#button-container", updateBubbleGraph);
+            function resetAndWalkAgain(character, xEnd) {
+                let xStart = (xEnd > 0) ? -300 : 1800;
+                character.attr("x", xStart);
+                initiateWalk(character, xStart, xEnd);
+            }
 
-            function slider_snap(min, max, containerSelector, onSliderChange) {
-                const margin = { top: 30, right: 20, bottom: 30, left: 40 },
-                    width = 500 - margin.left - margin.right,
-                    height = 100 - margin.top - margin.bottom;
+            function showThoughtBubble(element) {
+                let bbox = element.getBBox();
+                let bubbleX = bbox.x + bbox.width / 2 + 50;
+                let bubbleY = bbox.y - 50;
 
-                const x = d3.scaleLinear().domain([min, max]).range([0, width]);
+                svg.append("image")
+                    .attr("class", "thought-bubble")
+                    .attr("xlink:href", "./static/thought_bubble.png")
+                    .attr("x", bubbleX - 70)
+                    .attr("y", bubbleY - 50)
+                    .attr("width", 280)
+                    .attr("height", 160);
 
-                const svg = d3.select(containerSelector).append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                let text = svg.append("text")
+                    .attr("class", "thought-bubble-text")
+                    .attr("x", bubbleX)
+                    .attr("y", bubbleY)
+                    .attr("font-family", "Arial")
+                    .attr("font-size", "15px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black");
 
-                svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + 40 + ")")
-                    .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+                text.append("tspan")
+                    .attr("x", bubbleX + 30)
+                    .attr("dy", -5)
+                    .text("Click to see");
+
+                text.append("tspan")
+                    .attr("x", bubbleX + 25)
+                    .attr("dy", 20)
+                    .text("how I'm doing!");
+            }
+
+            function hideThoughtBubble() {
+                svg.selectAll(".thought-bubble").remove();
+                svg.selectAll(".thought-bubble-text").remove();
+            }
+
+            function characterClicked() {
+                d3.select("#brain").selectAll("*").remove();
+                createBrain(mentalHealthData);
+
+            }
+
+            function createBrain(data) {
+                alert("You clicked on a character");
+
+            }
+
+            function createIsotypeChart(data) {
+                let occupationCounts = d3.rollup(data, v => v.length, d => d.Occupation);
+
+                let svg = d3.select("#canvas");
+                let iconWidth = 20;
+                let iconHeight = 40;
+                let padding = 5;
+
+                let index1 = 0;
+                let index2 = 0; 
+                
+                let yPosition1 = 30; 
+                let yPosition2 = 30;
+
+                occupationCounts.forEach((count, occupation) => {
+                    if (occupation === "Business" || occupation === "Others") {
+                       
+                        let group = svg.append("g")
+                            .attr("class", occupation);
+                        let ratio = Math.floor(count / 10000)
+                        let extra = count % 10000
+
+                        group.append("text")
+                            .attr("x", 1100)
+                            .attr("y", yPosition1 - 15)
+                            .text(occupation + " (" + count + ")")
+                            .attr("font-weight", "bold");
+
+                        for (let i = 0; i <= ratio; i++) {
+                            let x = (i % 10) * (iconWidth + padding) + 1100;
+                            let y = yPosition1 + Math.floor(i / 10) * (iconHeight + padding);
+                            if (i < ratio) {
+                                group.append("image")
+                                    .attr("xlink:href", "./static/full_person.png")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("width", iconWidth)
+                                    .attr("height", iconHeight)
+                            }
 
 
-                var brush = d3.brushX()
-                    .extent([[0, 0], [width, height]])
-                    .on("brush", brushed)
-                    .on("end", brushended);
+                            if (i === ratio && extra > 0 && extra < 5000) {
+                                console.log("enter");
+                                group.append("image")
+                                    .attr("xlink:href", "./static/quarter_person.png")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("width", iconWidth)
+                                    .attr("height", iconHeight)
+                            }
+                            else if (i === ratio && extra >= 5000) {
+                                console.log("entered here");
 
-                const g = svg.append("g")
-                    .attr("class", "x brush")
-                    .call(brush)
-                    .call(brush.move, x.range());
-
-
-                function brushed(event) {
-                    const selection = event.selection.map(x.invert);
-                    onSliderChange(selection[0], selection[1]);
-
-                }
-
-                function brushended(event) {
-                    if (!event.selection) {
-                        console.log("No selection");
-                        return;
+                                group.append("image")
+                                    .attr("xlink:href", "./static/half_person.png")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("width", iconWidth)
+                                    .attr("height", iconHeight)
+                            }
+                        }
+                        yPosition1 += (Math.ceil(ratio / 10) * (iconHeight + padding)) + 50;
                     }
-                    [yearStart, yearEnd] = event.selection.map(x.invert).map(Math.round);
+                    else {
+                        let group = svg.append("g")
+                            .attr("class", occupation);
+                        let ratio = Math.floor(count / 10000)
+                        let extra = count % 10000
 
-                    updateBubbleGraph(yearStart, yearEnd);
-                }
+                        group.append("text")
+                            .attr("x", 1370)
+                            .attr("y", yPosition2 - 18)
+                            .text(occupation + " (" + count + ")")
+                            .attr("font-weight", "bold");
+
+                        for (let i = 0; i <= ratio; i++) {
+                            let x = (i % 10) * (iconWidth + padding) + 1370;
+                            let y = yPosition2 + Math.floor(i / 10) * (iconHeight + padding) - 5;
+                            if (i < ratio) {
+                                group.append("image")
+                                    .attr("xlink:href", "./static/full_person.png")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("width", iconWidth)
+                                    .attr("height", iconHeight)
+                            }
 
 
-                var gBrush = g.append("g")
-                    .attr("class", "brush")
-                    .call(brush)
+                            if (i === ratio && extra > 0 && extra < 5000) {
+                                console.log("enter");
+                                group.append("image")
+                                    .attr("xlink:href", "./static/quarter_person.png")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("width", iconWidth)
+                                    .attr("height", iconHeight)
+                            }
+                            else if (i === ratio && extra >= 5000) {
+                                console.log("entered here");
 
+                                group.append("image")
+                                    .attr("xlink:href", "./static/half_person.png")
+                                    .attr("x", x)
+                                    .attr("y", y)
+                                    .attr("width", iconWidth)
+                                    .attr("height", iconHeight)
+                            }
+                        }
+                        yPosition2 += (Math.ceil(ratio / 10) * (iconHeight + padding)) + 50;
+                    }
 
-                var handle = gBrush.selectAll(".handle--custom")
-                    .data([{ type: "w" }, { type: "e" }])
-                    .enter().append("path")
-                    .attr("class", "handle--custom")
-                    .attr("stroke", "#000")
-                    .attr("fill", '#eee')
-                    .attr("cursor", "ew-resize")
-                    .attr("d", brushResizePath);
-
-                var brushResizePath = function (d) {
-                    var e = +(d.type == "e"),
-                        x = e ? 1 : -1,
-                        y = height / 2;
-                    return "M" + (.5 * x) + "," + y + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6) + "V" + (2 * y - 6) +
-                        "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y) + "Z" + "M" + (2.5 * x) + "," + (y + 8) + "V" + (2 * y - 8) +
-                        "M" + (4.5 * x) + "," + (y + 8) + "V" + (2 * y - 8);
-                }
-
-                gBrush.selectAll(".overlay")
-                    .each(function (d) { d.type = "selection"; })
-                    .on("mousedown touchstart", brushcentered)
-
-                function brushcentered() {
-                    var dx = x(1) - x(0),
-                        cx = d3.mouse(this)[0],
-                        x0 = cx - dx / 2,
-                        x1 = cx + dx / 2;
-                    d3.select(this.parentNode).call(brush.move, x1 > width ? [width - dx, width] : x0 < 0 ? [0, dx] : [x0, x1]);
-                }
+                });
 
             }
+
+            createIsotypeChart(mentalHealthData);
 
         }
 
-        movieVisualization()
+        mentalHealthVisualization();
 
     </script>
 
